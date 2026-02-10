@@ -1,0 +1,24 @@
+---
+version: '3'
+
+tasks:
+  default:
+    desc: Run all linters.
+    alias: ["fix", "all"]
+    cmds:
+      - task: actions
+      - task: yaml
+
+  check:
+    desc: Check all files for linting issues without modifying them
+    cmds:
+      - task lint:actions
+      - task lint:yaml -- -lint
+
+  actions:
+    desc: Lint GitHub Actions workflow files
+    cmd: actionlint {{.CLI_ARGS}}
+
+  yaml:
+    desc: Format YAML files across the project
+    cmd: yamlfmt {{.CLI_ARGS}} **/*.yaml
