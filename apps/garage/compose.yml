@@ -1,0 +1,19 @@
+---
+configs:
+  garage_toml_template:
+    file: ./garage.toml
+
+services:
+  garage:
+    image: dxflrs/garage:v2.1.0
+    configs:
+      - source: garage_toml_template
+        target: /etc/garage.toml.tmpl
+    environment:
+      - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
+      - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        envsubst < /etc/garage.toml.tmpl > /etc/garage.toml
+        exec garage server

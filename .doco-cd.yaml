@@ -8,3 +8,5 @@ auto_discover_opts:
 
 external_secrets:
   TRAEFIK_CF_DNS_API_TOKEN: op://Automation/Cloudflare API Token/password
+  GARAGE_RPC_SECRET: op://Automation/Garage RPC Secret/password
+  GARAGE_ADMIN_TOKEN: op://Automation/Garage Admin Token/password
