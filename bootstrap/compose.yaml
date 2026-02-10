@@ -5,7 +5,7 @@ configs:
       - url: https://github.com/mirceanton/truenas-apps.git
         target: apps
         reference: main
-        interval: 120
+        interval: 300
 
 secrets:
   1pw_token:
