@@ -5,3 +5,6 @@ auto_discover: true
 auto_discover_opts:
   depth: 1
   delete: true
+
+external_secrets:
+  TRAEFIK_CF_DNS_API_TOKEN: op://Automation/Cloudflare API Token/password
