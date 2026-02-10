@@ -3,7 +3,7 @@ configs:
   poll-config.yml:
     content: |
       - url: https://github.com/mirceanton/truenas-apps.git
-        target: apps
+        target: bootstrap
         reference: main
         interval: 120
 
