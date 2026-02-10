@@ -5,7 +5,7 @@ configs:
 
 services:
   garage:
-    image: dxflrs/garage:v2.1.0
+    image: dxflrs/garage:v2.2.0
     configs:
       - source: garage_toml_template
         target: /etc/garage.toml.tmpl
