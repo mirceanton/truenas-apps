@@ -1,0 +1,44 @@
+---
+configs:
+  poll-config.yml:
+    content: |
+      - url: https://github.com/mirceanton/truenas-apps.git
+        reference: main
+        interval: 120
+
+secrets:
+  1pw_token:
+    file: /root/.doco-cd/1pw_token
+
+volumes:
+  data: {}
+
+services:
+  app:
+    container_name: doco-cd
+    image: ghcr.io/kimdre/doco-cd:0.64.0@sha256:379db0fd1fd5d185c9c39d70610f066e951d4503d2b2cd2b022a66f6d313b63e
+    ports: ["8080:8080"]
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+
+    secrets: ["1pw_token"]
+    configs:
+      - source: poll-config.yml
+        target: /poll-config.yml
+
+    environment:
+      TZ: Europe/Bucharest
+      HTTP_PORT: 8080
+      LOG_LEVEL: info
+      POLL_CONFIG_FILE: /poll-config.yml
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
+
+    healthcheck:
+      test: [CMD, /doco-cd, healthcheck]
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
