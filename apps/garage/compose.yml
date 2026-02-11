@@ -1,6 +1,6 @@
 ---
 configs:
-  garage_toml_template:
+  garage_config:
     file: ./garage.toml
 
 services:
@@ -8,14 +8,22 @@ services:
     container_name: garage
     image: dxflrs/garage:v2.2.0
     configs:
-      - source: garage_toml_template
-        target: /etc/garage.toml.tmpl
+      - source: garage_config
+        target: /etc/garage.toml
     environment:
       - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
       - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
-    entrypoint: ["/bin/sh"]
-    command:
-      - "-c"
-      - |
-        envsubst < /etc/garage.toml.tmpl > /etc/garage.toml;
-        exec garage server
+
+  webui:
+    container_name: garage-webui
+    image: khairul169/garage-webui:1.1.0
+    restart: unless-stopped
+    configs:
+      - source: garage_config
+        target: /etc/garage.toml
+    ports:
+      - 3909:3909
+    environment:
+      API_BASE_URL: "http://garage:3903"
+      API_ADMIN_KEY: ${GARAGE_ADMIN_TOKEN}
+      S3_ENDPOINT_URL: "http://garage:3900"

@@ -20,7 +20,6 @@ compression_level = 3
 # ===== RPC CONFIGURATION =====
 rpc_bind_addr = "[::]:3901"
 rpc_public_addr = "garage:3901"
-rpc_secret = "${GARAGE_RPC_SECRET}"
 
 # ===== S3 API CONFIGURATION =====
 [s3_api]
@@ -31,4 +30,3 @@ root_domain = ".s3.home.mirceanton.com"
 # ===== ADMIN API =====
 [admin]
 api_bind_addr = "[::]:3903"
-admin_token = "${GARAGE_ADMIN_TOKEN}"
