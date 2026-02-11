@@ -45,6 +45,7 @@ services:
       API_BASE_URL: "http://garage:3903"
       API_ADMIN_KEY: ${GARAGE_ADMIN_TOKEN}
       S3_ENDPOINT_URL: "http://garage:3900"
+      AUTH_USER_PASS: ${GARAGE_WEBUI_ADMIN_PASS}
     networks: ["traefik_network"]
     labels:
       - "traefik.enable=true"
