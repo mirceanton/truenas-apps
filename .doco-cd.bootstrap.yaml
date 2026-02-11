@@ -1,7 +1,0 @@
----
-working_dir: ./bootstrap
-auto_discover: true
-
-auto_discover_opts:
-  depth: 1
-  delete: true
