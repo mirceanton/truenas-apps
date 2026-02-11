@@ -1,0 +1,23 @@
+---
+services:
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:v10.0.0
+    restart: unless-stopped
+    expose: ["8080"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DOZZLE_NO_ANALYTICS=true
+    networks: ["traefik_network"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dozzle.rule=Host(`dozzle.nas.svc.h.mirceanton.com`)"
+      - "traefik.http.routers.dozzle.entrypoints=websecure"
+      - "traefik.http.routers.dozzle.tls.certresolver=cloudflare"
+      - "traefik.http.routers.dozzle.service=dozzle"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+
+networks:
+  traefik_network:
+    external: true
