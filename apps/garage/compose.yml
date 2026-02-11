@@ -13,6 +13,9 @@ services:
     environment:
       - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
       - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+    volumes:
+      - /mnt/tank/Apps/Garage/meta:/var/lib/garage/meta
+      - /mnt/tank/Apps/Garage/data:/var/lib/garage/data
     expose: ["3900", "3903"]
     networks: ["traefik_network"]
     labels:
