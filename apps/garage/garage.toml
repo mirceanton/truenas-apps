@@ -25,7 +25,7 @@ rpc_public_addr = "garage:3901"
 [s3_api]
 s3_region = "garage"
 api_bind_addr = "[::]:3900"
-root_domain = ".s3.home.mirceanton.com"
+root_domain = ".s3.nas.svc.h.mirceanton.com"
 
 # ===== ADMIN API =====
 [admin]
