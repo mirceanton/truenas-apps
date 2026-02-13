@@ -9,6 +9,7 @@ tasks:
       - task: actions
       - task: yaml
       - task: tofu
+      - task: tofu-validate-all
 
   check:
     desc: Check all files for linting issues without modifying them
@@ -16,6 +17,7 @@ tasks:
       - task lint:actions
       - task lint:yaml -- -lint
       - task lint:tofu -- -check
+      - task: tofu-validate-all
 
   actions:
     desc: Lint GitHub Actions workflow files
@@ -28,3 +30,22 @@ tasks:
   tofu:
     desc: Lint TOFU files
     cmd: tofu fmt -recursive {{.CLI_ARGS}}
+
+  tofu-validate-all:
+    desc: Run tofu init and validate for all subdirs under infrastructure/
+    cmds:
+      - for:
+          var: DIRS
+        task: tofu-validate-one
+        vars:
+          DIR: "{{.ITEM}}"
+    vars:
+      DIRS:
+        sh: find ./infrastructure -mindepth 1 -maxdepth 1 -type d
+
+  tofu-validate-one:
+    internal: true
+    dir: "{{.DIR}}"
+    cmds:
+      - tofu init -upgrade
+      - tofu validate
