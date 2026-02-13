@@ -27,7 +27,7 @@ if [ "$LOCAL" = "$REMOTE" ]; then
     exit 0
 fi
 
-git pull --ff-only
+git reset --hard "$REMOTE"
 
 if git diff --quiet "${LOCAL}" HEAD -- bootstrap/; then
     log "Changes pulled but none in bootstrap/, skipping compose."
