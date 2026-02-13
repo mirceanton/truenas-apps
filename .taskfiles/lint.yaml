@@ -8,12 +8,14 @@ tasks:
     cmds:
       - task: actions
       - task: yaml
+      - task: tofu
 
   check:
     desc: Check all files for linting issues without modifying them
     cmds:
       - task lint:actions
       - task lint:yaml -- -lint
+      - task lint:tofu -- -check
 
   actions:
     desc: Lint GitHub Actions workflow files
@@ -22,3 +24,7 @@ tasks:
   yaml:
     desc: Format YAML files across the project
     cmd: yamlfmt {{.CLI_ARGS}} **/*.yaml
+
+  tofu:
+    desc: Lint TOFU files
+    cmd: tofu fmt -recursive {{.CLI_ARGS}}
