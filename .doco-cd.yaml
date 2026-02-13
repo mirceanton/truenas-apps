@@ -13,4 +13,4 @@ external_secrets:
   GARAGE_WEBUI_ADMIN_PASS: op://Automation/Garage WebUI/htpasswd
   DOZZLE_ADMIN_USERNAME: op://Automation/Dozzle/username
   DOZZLE_ADMIN_PASSWORD: op://Automation/Dozzle/htpasswd
-  TRAEFIK_DASHBOARD_BASIC_AUTH: op://Automation/Traefik Dashboard/password
+  TRAEFIK_DASHBOARD_BASIC_AUTH: op://Automation/Traefik Dashboard/htpasswd
