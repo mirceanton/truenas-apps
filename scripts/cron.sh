@@ -17,7 +17,7 @@ log() {
 
 cd "$REPO_DIR"
 
-git fetch origin
+git fetch origin 2>/dev/null
 
 LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse @{u})
@@ -36,7 +36,7 @@ fi
 
 log "Changes detected in bootstrap/, running docker compose up..."
 cd "$COMPOSE_DIR"
-docker compose up -d
+docker compose up -d 2>/dev/null
 log "Done."
 
 log "Waiting for containers to be healthy..."
@@ -57,4 +57,4 @@ else
     exit 1
 fi
 
-docker compose ps
+docker compose ps 2>/dev/null
