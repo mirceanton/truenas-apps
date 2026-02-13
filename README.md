@@ -6,8 +6,6 @@ GitOps source of truth for applications running via Docker on my TrueNAS home se
 
 This repository defines all the Docker Compose stacks deployed on my homelab TrueNAS server. Changes pushed to `main` are automatically picked up and applied, making the repo the single source of truth for what applications run on the server.
 
-The setup uses a **two-stage doco-cd architecture** (bootstrap -> apps) to achieve a fully self-managing deployment pipeline, since by default doco-cd cannot manage/update itself.
-
 ## Initial Setup
 
 1. SSH into the TrueNAS server
@@ -18,42 +16,38 @@ The setup uses a **two-stage doco-cd architecture** (bootstrap -> apps) to achie
    echo "<1password-service-account-token>" > /root/.doco-cd/1pw_token
    ```
 
-3. Deploy the bootstrap compose stack:
+3. Clone the repo locally
 
    ```bash
-   cd /path/to/bootstrap
+   git clone https://github.com/mirceanton/truenas-apps /var/apps
+   ```
+
+4. Deploy the bootstrap compose stack:
+
+   ```bash
+   cd /var/apps/bootstrap
    docker compose up -d
    ```
+
+5. Create a CronJob in TrueNAS to run the `scripts/cron.sh` scrip on a schedule (I personally do hourly)
+
+   ![TrueNAS CronJob](docs/truenas_cron.png)
 
 From this point on, *everything* is self-managing.
 
 ## How It Works
 
-### The Two doco-cd Instances
-
-The system uses two doco-cd instances to solve a chicken-and-egg problem:
-
-| Instance                     | Deployed by                | Watches                | Purpose                                                     |
-| ---------------------------- | -------------------------- | ---------------------- | ----------------------------------------------------------- |
-| **Bootstrap** (`bootstrap/`) | Manual `docker compose up` | `apps/` directory      | Gets the system started; deploys and manages all app stacks |
-| **Apps** (`apps/doco-cd/`)   | The bootstrap instance     | `bootstrap/` directory | Keeps the bootstrap instance itself up to date              |
-
-**Why two instances?** A single doco-cd instance cannot update its own compose file. Replacing yourself mid-run is a recipe for trouble. Instead, each instance watches and manages the *other*:
-
-1. **Bootstrap doco-cd** polls the repo every **5 minutes** and deploys everything under `apps/`, including the apps doco-cd instance.
-2. **Apps doco-cd** polls every **1 hour** and deploys the `bootstrap/` directory, keeping the bootstrap instance updated.
-
-This creates a "mutual management loop" where both instances keep each other current, and the entire stack is self-healing from a single `git push`.
-
-Since both doco-cd instances manage each other, a simultaneous update of both could leave the system with no running controller to recover from a failure. To prevent this, the [Renovate configuration](.renovaterc.json) creates separate PRs for each instance (via distinct `additionalBranchPrefix` values) and uses different `minimumReleaseAge` settings — 3 days for the bootstrap instance vs. 2 days for the apps instance. This ensures that when a new doco-cd version is released, the two instances are never upgraded at the same time; one is always running and healthy to manage the other's rollout. (at least in theory :sweat_smile:)
-
 ### Auto-Discovery
 
-Both doco-cd instances use `auto_discover: true` with `depth: 1`, meaning they automatically find and deploy any subdirectory containing a `compose.yaml`. Adding a new app is as simple as creating a new folder under `apps/` with a compose file. The `delete: true` option ensures that removing a directory also tears down the corresponding stack.
+doco-cd uses `auto_discover: true` with `depth: 1`, meaning it automatically finds and deploys any subdirectory containing a `compose.yaml`. Adding a new app is as simple as creating a new folder under `apps/` with a compose file. The `delete: true` option ensures that removing a directory also tears down the corresponding stack.
 
 ### Secret Management
 
 Secrets are managed through **1Password** using doco-cd's built-in secret provider integration. A 1Password service account token is stored on the TrueNAS host at `/root/.doco-cd/1pw_token`, and doco-cd injects secrets from 1Password vaults into compose stacks as environment variables.
+
+### DocoCD Updates
+
+The `scripts/cron.sh` script can be run as an cronjob on the TrueNAS server. It fetches the latest changes from the repository, checks for updates in the `bootstrap/` directory, and if any are found, runs `docker compose up -d` to apply them. The script waits for all containers to become healthy before finishing. This ensures that the doco-cd stack and all managed applications are always up to date with the repository.
 
 ## License
 
