@@ -1,0 +1,96 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Terragrunt CI
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - root.hcl
+      - infrastructure/**
+      - terraform/**
+
+jobs:
+  plan:
+    runs-on: infra-runners
+    outputs:
+      drift_detected: ${{ steps.plan.outputs.drift_detected }}
+      plan_output: ${{ steps.plan.outputs.plan_output }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup mise
+        uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
+
+      - name: Load Secrets
+        uses: ./.github/actions/load-secrets
+        with:
+          op-service-account-token: ${{ secrets.op-service-account-token }}
+
+      - name: Terragrunt Init
+        run: terragrunt run --all -- init -upgrade
+
+      - name: Terragrunt Plan
+        id: plan
+        run: |
+          terragrunt run --all -- plan --detailed-exitcode -no-color 2>&1 | tee plan_output.txt
+
+          if [ "${PIPESTATUS[0]}" -eq 2 ]; then
+            echo "drift_detected=true" | tee "$GITHUB_OUTPUT"
+          else
+            echo "drift_detected=false" | tee "$GITHUB_OUTPUT"
+          fi
+
+          {
+            echo "plan_output<<EOF"
+            cat plan_output.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  comment:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: plan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup mise
+        uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
+
+      - name: Generate Token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: app-token
+        with:
+          app-id: "${{ secrets.BOT_APP_ID }}"
+          private-key: "${{ secrets.BOT_APP_PRIVATE_KEY }}"
+
+      - name: Create PR comment
+        env:
+          GITHUB_TOKEN: "${{ steps.app-token.outputs.token }}"
+          PLAN_OUTPUT: "${{ needs.plan.outputs.plan_output }}"
+          DRIFT_DETECTED: "${{ needs.plan.outputs.drift_detected }}"
+          STATUS: "${{ needs.plan.outputs.drift_detected == 'true' && '⚠️ Changes detected' || '✅ No changes' }}"
+        run: |
+          {
+            echo "## 🤖 Terragrunt Plan Results"
+            echo ""
+            echo "**Status:** $STATUS"
+            echo ""
+            echo "<details>"
+            echo "<summary>Click to expand plan output</summary>"
+            echo ""
+            echo '```terraform'
+            echo "$PLAN_OUTPUT"
+            echo '```'
+            echo ""
+            echo "</details>"
+            echo ""
+            echo "---"
+            echo "*Workflow run: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
+          } > comment_body.txt
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file comment_body.txt
