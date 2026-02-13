@@ -4,7 +4,7 @@ GitOps source of truth for applications running via Docker on my TrueNAS home se
 
 ## Overview
 
-This repository defines all the Docker Compose stacks deployed on my homelab TrueNAS server. Changes pushed to `main` are automatically picked up and applied by doco-cd, making the repo the single source of truth for what runs on the server. Infrastructure provisioning for services like Nexus and Garage is managed with [OpenTofu](https://opentofu.org/), and secrets are injected at deploy time from [1Password](https://1password.com/).
+This repository defines all the Docker Compose stacks deployed on my homelab TrueNAS server. Changes pushed to `main` are automatically picked up and applied by doco-cd, making the repo the single source of truth for what runs on the server. Infrastructure provisioning for services like Nexus and Garage is managed with [OpenTofu](https://opentofu.org/) + [Terragrunt](https://terragrunt.gruntwork.io/), and secrets are injected at deploy time from [1Password](https://1password.com/).
 
 ## Repository Structure
 
@@ -12,20 +12,20 @@ This repository defines all the Docker Compose stacks deployed on my homelab Tru
 .
 ├── apps/                      # Docker Compose application stacks
 ├── bootstrap/                 # doco-cd bootstrap stack
-├── infrastructure/            # OpenTofu configurations
+├── infrastructure/            # Terragrunt units (per-service config + inputs)
+├── terraform/                 # OpenTofu modules (actual resource definitions)
 ├── scripts/                   # Automation scripts
-├── .taskfiles/                # Task runner definitions
-├── .doco-cd.yaml              # doco-cd configuration
+├── root.hcl                   # Terragrunt root config
 ├── Taskfile.yaml              # Task runner entrypoint
 └── .mise.toml                 # Tool version management
 ```
 
 ## Infrastructure as Code
 
-The `infrastructure/` directory contains OpenTofu configurations that provision resources inside deployed services:
+The `terraform/` directory contains the OpenTofu code, and `infrastructure/` contains the [Terragrunt](https://terragrunt.gruntwork.io/) units that wire them together with environment-specific inputs. Remote state is stored in a Garage S3 bucket (configured in `root.hcl`).
 
-- **Nexus** — various proxy/hosted/group repositories, roles, users, and security realms.
-- **Garage** — S3 buckets and access keys
+- [**Garage**](infrastructure/garage/) — S3 buckets and access keys
+- [**Nexus**](infrastructure/nexus/) — proxy/hosted/group repositories, RBAC roles, users, and security realms
 
 ## Initial Setup
 
