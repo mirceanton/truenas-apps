@@ -4,7 +4,28 @@ GitOps source of truth for applications running via Docker on my TrueNAS home se
 
 ## Overview
 
-This repository defines all the Docker Compose stacks deployed on my homelab TrueNAS server. Changes pushed to `main` are automatically picked up and applied, making the repo the single source of truth for what applications run on the server.
+This repository defines all the Docker Compose stacks deployed on my homelab TrueNAS server. Changes pushed to `main` are automatically picked up and applied by doco-cd, making the repo the single source of truth for what runs on the server. Infrastructure provisioning for services like Nexus and Garage is managed with [OpenTofu](https://opentofu.org/), and secrets are injected at deploy time from [1Password](https://1password.com/).
+
+## Repository Structure
+
+```bash
+.
+├── apps/                      # Docker Compose application stacks
+├── bootstrap/                 # doco-cd bootstrap stack
+├── infrastructure/            # OpenTofu configurations
+├── scripts/                   # Automation scripts
+├── .taskfiles/                # Task runner definitions
+├── .doco-cd.yaml              # doco-cd configuration
+├── Taskfile.yaml              # Task runner entrypoint
+└── .mise.toml                 # Tool version management
+```
+
+## Infrastructure as Code
+
+The `infrastructure/` directory contains OpenTofu configurations that provision resources inside deployed services:
+
+- **Nexus** — various proxy/hosted/group repositories, roles, users, and security realms.
+- **Garage** — S3 buckets and access keys
 
 ## Initial Setup
 
@@ -16,7 +37,7 @@ This repository defines all the Docker Compose stacks deployed on my homelab Tru
    echo "<1password-service-account-token>" > /root/.doco-cd/1pw_token
    ```
 
-3. Clone the repo locally
+3. Clone the repo:
 
    ```bash
    git clone https://github.com/mirceanton/truenas-apps /var/apps
@@ -29,7 +50,7 @@ This repository defines all the Docker Compose stacks deployed on my homelab Tru
    docker compose up -d
    ```
 
-5. Create a CronJob in TrueNAS to run the `scripts/cron.sh` scrip on a schedule (I personally do hourly)
+5. Create a CronJob in TrueNAS to run `scripts/cron.sh` on a schedule (e.g. hourly):
 
    ![TrueNAS CronJob](docs/truenas_cron.png)
 
@@ -39,15 +60,15 @@ From this point on, *everything* is self-managing.
 
 ### Auto-Discovery
 
-doco-cd uses `auto_discover: true` with `depth: 1`, meaning it automatically finds and deploys any subdirectory containing a `compose.yaml`. Adding a new app is as simple as creating a new folder under `apps/` with a compose file. The `delete: true` option ensures that removing a directory also tears down the corresponding stack.
+doco-cd uses `auto_discover: true` with `depth: 1`, meaning it automatically finds and deploys any subdirectory under `apps/` containing a `compose.yaml`. Adding a new app is as simple as creating a new folder with a compose file. The `delete: true` option ensures that removing a directory also tears down the corresponding stack.
 
 ### Secret Management
 
-Secrets are managed through **1Password** using doco-cd's built-in secret provider integration. A 1Password service account token is stored on the TrueNAS host at `/root/.doco-cd/1pw_token`, and doco-cd injects secrets from 1Password vaults into compose stacks as environment variables.
+Secrets are managed through **1Password** using doco-cd's built-in secret provider integration. A 1Password service account token is stored on the TrueNAS host at `/root/.doco-cd/1pw_token`, and doco-cd injects secrets from 1Password vaults into compose stacks as environment variables at deploy time.
 
-### DocoCD Updates
+### Self-Updating Bootstrap
 
-The `scripts/cron.sh` script can be run as an cronjob on the TrueNAS server. It fetches the latest changes from the repository, checks for updates in the `bootstrap/` directory, and if any are found, runs `docker compose up -d` to apply them. The script waits for all containers to become healthy before finishing. This ensures that the doco-cd stack and all managed applications are always up to date with the repository.
+The `scripts/cron.sh` script runs as a TrueNAS CronJob. It fetches the latest changes from the repository, checks for updates in the `bootstrap/` directory, and if any are found, runs `docker compose up -d` to apply them. The script waits for all containers to become healthy before finishing, ensuring the doco-cd stack itself stays up to date.
 
 ## License
 
