@@ -4,6 +4,10 @@ terraform {
       source  = "sonatype-nexus-community/sonatyperepo"
       version = "1.0.3"
     }
+    onepassword = {
+      source  = "1Password/onepassword"
+      version = "3.2.1"
+    }
   }
 }
 
@@ -13,13 +17,10 @@ provider "sonatyperepo" {
   password = var.nexus_password
 }
 
-variable "nexus_url" {
-  type = string
+provider "onepassword" {
+  service_account_token = var.op_service_account_token
 }
-variable "nexus_username" {
-  type = string
-}
-variable "nexus_password" {
-  type = string
-  sensitive = true
+
+data "onepassword_vault" "vault" {
+  name = var.op_vault_name
 }

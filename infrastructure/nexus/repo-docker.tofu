@@ -12,8 +12,8 @@ locals {
 
 resource "sonatyperepo_repository_docker_proxy" "docker_proxy" {
   for_each = { for registry in local.registries : registry.name => registry }
-  name   = each.key
-  online = true
+  name     = each.key
+  online   = true
 
   storage = {
     blob_store_name                = "default"
@@ -79,8 +79,8 @@ resource "sonatyperepo_repository_docker_group" "docker_group" {
 
   group = {
     member_names = concat(
-       [sonatyperepo_repository_docker_hosted.docker_hosted.name],
-       [for registry in local.registries : sonatyperepo_repository_docker_proxy.docker_proxy[registry.name].name]
+      [sonatyperepo_repository_docker_hosted.docker_hosted.name],
+      [for registry in local.registries : sonatyperepo_repository_docker_proxy.docker_proxy[registry.name].name]
     )
   }
 

@@ -1,5 +1,5 @@
 resource "sonatyperepo_role" "global_readonly" {
-  id      = "global-readonly"
+  id          = "global-readonly"
   name        = "Global Read-Only"
   description = "Read and browse access to all repositories"
   privileges = [
@@ -9,7 +9,7 @@ resource "sonatyperepo_role" "global_readonly" {
 }
 
 resource "sonatyperepo_role" "global_readwrite" {
-  id      = "global-readwrite"
+  id          = "global-readwrite"
   name        = "Global Read-Write"
   description = "Full read and write access to all repositories"
   privileges = [
@@ -22,7 +22,7 @@ resource "sonatyperepo_role" "global_readwrite" {
 }
 
 resource "sonatyperepo_role" "docker_readonly" {
-  id      = "docker-readonly"
+  id          = "docker-readonly"
   name        = "Docker Read-Only"
   description = "Read and browse access to all Docker repositories"
   privileges = [
@@ -32,7 +32,7 @@ resource "sonatyperepo_role" "docker_readonly" {
 }
 
 resource "sonatyperepo_role" "docker_readwrite" {
-  id      = "docker-readwrite"
+  id          = "docker-readwrite"
   name        = "Docker Read-Write"
   description = "Full read and write access to all Docker repositories"
   privileges = [
