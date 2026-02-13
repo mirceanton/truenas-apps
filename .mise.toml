@@ -2,3 +2,4 @@
 task = "latest"
 yamlfmt = "latest"
 actionlint = "latest"
+opentofu = "latest"
