@@ -39,4 +39,22 @@ cd "$COMPOSE_DIR"
 docker compose up -d
 log "Done."
 
+log "Waiting for containers to be healthy..."
+TIMEOUT=120
+if timeout "$TIMEOUT" bash -c '
+    while true; do
+        if docker compose ps --format json | jq -e "select(.Health != \"\" and .Health != \"healthy\")" > /dev/null 2>&1; then
+            sleep 5
+        else
+            break
+        fi
+    done
+'; then
+    log "All containers healthy."
+else
+    log "ERROR: Containers not healthy after ${TIMEOUT}s"
+    docker compose ps
+    exit 1
+fi
+
 docker compose ps
