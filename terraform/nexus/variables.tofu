@@ -10,10 +10,6 @@ variable "nexus_password" {
   sensitive = true
 }
 
-variable "op_service_account_token" {
-  type      = string
-  sensitive = true
-}
 variable "op_vault_name" {
   type    = string
   default = "Automation"

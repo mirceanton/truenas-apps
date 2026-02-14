@@ -16,10 +16,6 @@ provider "garage" {
   token    = var.garage_token
 }
 
-provider "onepassword" {
-  service_account_token = var.op_service_account_token
-}
-
 data "onepassword_vault" "vault" {
   name = var.op_vault_name
 }
