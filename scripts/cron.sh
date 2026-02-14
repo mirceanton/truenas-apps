@@ -25,7 +25,10 @@ cd "$REPO_DIR"
 git fetch origin 2>/dev/null
 
 LOCAL=$(git rev-parse HEAD)
+log_info "Current local commit: ${LOCAL}"
+
 REMOTE=$(git rev-parse @{u})
+log_info "Current remote commit: ${REMOTE}"
 
 if [ "$LOCAL" = "$REMOTE" ]; then
     log_info "No changes."
