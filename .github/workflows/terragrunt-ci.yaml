@@ -29,7 +29,9 @@ jobs:
       - name: Load Secrets
         uses: ./.github/actions/load-secrets
         with:
-          op-service-account-token: ${{ secrets.op-service-account-token }}
+          op-service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          op-connect-host: ${{ secrets.OP_CONNECT_HOST }}
+          op-connect-token: ${{ secrets.OP_CONNECT_TOKEN }}
 
       - name: Terragrunt Init
         run: terragrunt run --all -- init -upgrade
