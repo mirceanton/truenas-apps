@@ -3,5 +3,6 @@
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+credentials.auto.tfvars
 
 .terragrunt-cache/
