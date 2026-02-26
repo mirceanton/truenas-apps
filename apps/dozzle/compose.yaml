@@ -10,7 +10,7 @@ configs:
 services:
   dozzle:
     container_name: dozzle
-    image: amir20/dozzle:v10.0.4
+    image: amir20/dozzle:v10.0.5
     restart: unless-stopped
     expose: ["8080"]
     configs:
