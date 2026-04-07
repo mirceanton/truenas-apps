@@ -3,7 +3,7 @@ services:
   # === SYSTEM METRICS ===
   node-exporter:
     container_name: node-exporter
-    image: quay.io/prometheus/node-exporter:v1.11.0
+    image: quay.io/prometheus/node-exporter:v1.11.1
     pid: host
     restart: unless-stopped
     ports: ["10.0.0.245:9100:9100"]
