@@ -6,7 +6,7 @@ configs:
 services:
   garage:
     container_name: garage
-    image: dxflrs/garage:v2.2.0
+    image: dxflrs/garage:v2.3.0
     configs:
       - source: garage_config
         target: /etc/garage.toml
