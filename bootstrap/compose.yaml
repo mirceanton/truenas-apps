@@ -16,7 +16,7 @@ volumes:
 services:
   app:
     container_name: doco-cd
-    image: ghcr.io/kimdre/doco-cd:0.85.0@sha256:b977240ff3fb54061b68b6eafa80b3caf98559f0b17413aa2d5f6898f8c81360
+    image: ghcr.io/kimdre/doco-cd:0.85.1@sha256:2f4650dfcd25c17d7c6b274a47b1e205d8408e3ee12a33aa3a2459b4604757ef
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
