@@ -24,6 +24,17 @@ data "onepassword_item" "garage_webui" {
   title = "Garage WebUI"
 }
 
+# --- Keycloak ---
+data "onepassword_item" "keycloak" {
+  vault = data.onepassword_vault.vault.uuid
+  title = "Keycloak"
+}
+
+data "onepassword_item" "keycloak_db" {
+  vault = data.onepassword_vault.vault.uuid
+  title = "Keycloak DB"
+}
+
 # --- Traefik ---
 data "onepassword_item" "cloudflare" {
   vault = data.onepassword_vault.vault.uuid

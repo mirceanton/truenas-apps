@@ -35,6 +35,17 @@ resource "truenas_app" "garage" {
   depends_on = [truenas_app.traefik]
 }
 
+resource "truenas_app" "keycloak" {
+  name       = "keycloak"
+  custom_app = true
+  compose_config = templatefile("${path.module}/files/keycloak/compose.yaml", {
+    KEYCLOAK_ADMIN_USERNAME = replace(data.onepassword_item.keycloak.username, "$", "$$")
+    KEYCLOAK_ADMIN_PASSWORD = replace(data.onepassword_item.keycloak.password, "$", "$$")
+    KEYCLOAK_DB_PASSWORD    = replace(data.onepassword_item.keycloak_db.password, "$", "$$")
+  })
+  depends_on = [truenas_app.traefik]
+}
+
 resource "truenas_app" "nexus" {
   name           = "registry"
   custom_app     = true
