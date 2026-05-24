@@ -7,8 +7,10 @@ remote_state {
   }
 
   config = {
-    endpoints                   = { s3 = "https://s3.nas.svc.h.mirceanton.com" }
-    bucket                      = "tfstate-truenas-apps"
+    endpoints = {
+      s3 = "https://s3.eu-central-003.backblazeb2.com"
+    }
+    bucket                      = "tfstate-truenas-terraform"
     key                         = "${replace(path_relative_to_include(), "infrastructure/", "")}/tfstate.json"
     region                      = "us-east-1"
     use_lockfile                = true
