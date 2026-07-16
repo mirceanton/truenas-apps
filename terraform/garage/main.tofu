@@ -2,7 +2,7 @@ terraform {
   required_providers {
     garage = {
       source  = "registry.terraform.io/jkossis/garage"
-      version = "1.0.4"
+      version = "1.0.5"
     }
     onepassword = {
       source  = "1Password/onepassword"
