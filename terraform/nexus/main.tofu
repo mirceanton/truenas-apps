@@ -2,7 +2,7 @@ terraform {
   required_providers {
     sonatyperepo = {
       source  = "sonatype-nexus-community/sonatyperepo"
-      version = "1.16.0"
+      version = "1.16.1"
     }
     onepassword = {
       source  = "1Password/onepassword"
